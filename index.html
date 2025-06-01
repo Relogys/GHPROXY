@@ -3,144 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub 文件加速</title>
+    <title>GitHub 文件加速 - 极速版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        :root {
+            --primary-color: #007bff; /* Azul vibrante */
+            --primary-color-dark: #0056b3;
+            --secondary-color: #6c757d;
+            --background-start: #e0c3fc; /* Lavanda suave */
+            --background-end: #8ec5fc;   /* Azul cielo */
+            --text-color: #343a40;
+            --light-text-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.95); /* Tarjeta ligeramente transparente */
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --input-border: #ced4da;
+            --input-focus-border: #80bdff;
+            --input-focus-shadow: rgba(0, 123, 255, 0.25);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
-            font-family: 'Noto Sans SC', sans-serif;
+            font-family: 'Poppins', 'Noto Sans SC', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
-            overflow: hidden; /* 防止动画元素溢出 */
+            color: var(--text-color);
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            background-size: 400% 400%; /* Para animación de gradiente */
+            animation: gradientAnimation 20s ease infinite;
+            overflow-x: hidden; /* Prevenir scroll horizontal por animaciones */
+            position: relative; /* Para los elementos de fondo animados */
         }
+
+        /* Animación de gradiente de fondo */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Formas animadas en el fondo */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+            animation: floatShape 25s infinite ease-in-out alternate;
+        }
+        .shape1 {
+            width: clamp(150px, 30vw, 400px);
+            height: clamp(150px, 30vw, 400px);
+            background: rgba(255, 255, 255, 0.5);
+            top: 10%;
+            left: 5%;
+        }
+        .shape2 {
+            width: clamp(100px, 20vw, 300px);
+            height: clamp(100px, 20vw, 300px);
+            background: rgba(255, 255, 255, 0.4);
+            bottom: 15%;
+            right: 10%;
+            animation-delay: -5s;
+            animation-duration: 30s;
+        }
+         .shape3 {
+            width: clamp(80px, 15vw, 200px);
+            height: clamp(80px, 15vw, 200px);
+            background: rgba(0, 123, 255, 0.3);
+            top: 50%;
+            left: 40%;
+            transform: translateY(-50%);
+            animation-delay: -10s;
+            animation-duration: 20s;
+        }
+
+        @keyframes floatShape {
+            0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-30px) translateX(20px) rotate(180deg) scale(1.1); }
+            100% { transform: translateY(0px) translateX(0px) rotate(360deg) scale(1); }
+        }
+
 
         .container {
-            background-color: white;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px); /* Efecto vidrio esmerilado */
+            -webkit-backdrop-filter: blur(10px);
+            padding: clamp(25px, 5vw, 50px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px var(--shadow-color);
             text-align: center;
             width: 90%;
-            max-width: 500px;
-            animation: fadeInScaleUp 0.8s ease-out forwards;
-            opacity: 0; /* Start with opacity 0 for fade in */
+            max-width: 550px;
+            animation: fadeInFromBottom 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil para el efecto vidrio */
         }
 
-        @keyframes fadeInScaleUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
+        @keyframes fadeInFromBottom {
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
         h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
+            color: var(--primary-color);
+            margin-bottom: 0.5em;
             font-weight: 700;
-            font-size: 2em; /* 调整标题大小 */
+            font-size: clamp(1.8rem, 5vw, 2.5rem); /* Tamaño de fuente adaptable */
+            animation: slideInText 0.7s ease-out 0.3s forwards;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .subtitle {
+            color: var(--secondary-color);
+            margin-bottom: 2em;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-weight: 300;
+            animation: slideInText 0.7s ease-out 0.5s forwards;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        
+        @keyframes slideInText {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         #githubUrl {
-            width: calc(100% - 24px); /* 减去 padding */
-            padding: 15px 12px; /* 增加 padding */
-            margin-bottom: 25px; /* 增加间距 */
-            border: 2px solid #dfe4ea;
-            border-radius: 8px;
-            font-size: 1em; /* 调整字体大小 */
+            width: 100%;
+            padding: 15px 18px;
+            margin-bottom: 1.8em;
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            box-sizing: border-box; /* 确保 padding 和 border 不会增加总宽度 */
         }
 
         #githubUrl:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 0.2rem var(--input-focus-shadow);
             outline: none;
         }
 
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 15px 30px; /* 增加 padding */
+        .button-accelerate {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+            color: var(--light-text-color);
+            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1em; /* 调整字体大小 */
+            border-radius: 10px;
+            font-size: clamp(1rem, 3vw, 1.1rem);
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
+            position: relative; /* Para el efecto ripple */
+            overflow: hidden;   /* Para contener el ripple */
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
         }
 
-        button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
+        .button-accelerate:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        }
+        
+        .button-accelerate:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
         }
 
-        button:active {
-            background-color: #2471a3;
-            transform: translateY(0);
-        }
-
-        /* Optional: Animated background shapes for more flair */
-        body::before, body::after {
-            content: '';
-            position: fixed;
+        /* Efecto Ripple */
+        .ripple {
+            position: absolute;
             border-radius: 50%;
-            background: rgba(52, 152, 219, 0.1);
-            z-index: -1;
-            animation: float 15s infinite ease-in-out;
+            background-color: rgba(255, 255, 255, 0.6); /* Color del ripple */
+            transform: scale(0);
+            animation: ripple-animation 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none; 
         }
 
-        body::before {
-            width: 200px;
-            height: 200px;
-            top: 10%;
-            left: 10%;
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
         }
 
-        body::after {
-            width: 300px;
-            height: 300px;
-            bottom: 10%;
-            right: 10%;
-            animation-delay: -7.5s; /* Offset animation */
+        /* Adaptabilidad */
+        @media (max-width: 768px) {
+            .container {
+                padding: clamp(20px, 4vw, 40px);
+                margin: 20px; /* Añadir margen en pantallas pequeñas */
+            }
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-            25% { transform: translateY(20px) translateX(-15px) rotate(45deg); }
-            50% { transform: translateY(-10px) translateX(10px) rotate(90deg); }
-            75% { transform: translateY(15px) translateX(20px) rotate(135deg); }
+        @media (max-width: 480px) {
+            h1 {
+                 margin-bottom: 0.8em;
+            }
+            .subtitle {
+                margin-bottom: 1.5em;
+            }
+             #githubUrl, .button-accelerate {
+                padding: 12px 15px;
+            }
         }
+
     </style>
 </head>
 <body>
+    <!-- Elementos de fondo animados -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
     <div class="container">
         <h1>GitHub 文件加速</h1>
-        <p style="color: #555; margin-top: -20px; margin-bottom: 30px;">粘贴 GitHub 文件链接，享受加速体验</p>
+        <p class="subtitle">粘贴 GitHub 文件链接，即刻体验飞一般的速度！</p>
         <input type="text" id="githubUrl" placeholder="例如: https://github.com/user/repo/blob/main/file.zip">
-        <button onclick="navigateToProxy()">开始加速</button>
+        <button class="button-accelerate" id="accelerateButton">光速下载</button>
     </div>
 
     <script>
         // !!! 重要: 这里的 PREFIX 必须和你的 Cloudflare Worker 脚本中的 PREFIX 常量完全一致 !!!
-        const PREFIX = '/gh/'; // 例如 '/gh/' 或 '/'
+        const PREFIX = '/gh/'; // 例如 '/gh/' 或 '/' (根据你的Worker配置)
+
+        const accelerateButton = document.getElementById('accelerateButton');
+        const githubUrlInput = document.getElementById('githubUrl');
 
         function navigateToProxy() {
-            const githubUrlInput = document.getElementById('githubUrl');
             const githubUrl = githubUrlInput.value.trim();
-
             if (githubUrl) {
-                // location.origin 会获取当前页面的源路径 (例如 https://your-worker.workers.dev)
-                // 然后拼接 PREFIX 和用户输入的 GitHub URL
                 window.location.href = location.origin + PREFIX + githubUrl;
             } else {
                 alert('请输入有效的 GitHub 文件链接！');
@@ -148,13 +250,47 @@
             }
         }
 
-        // 让用户可以通过按 Enter 键提交
-        document.getElementById('githubUrl').addEventListener('keypress', function(event) {
+        accelerateButton.addEventListener('click', function(event) {
+            createRipple(event);
+            navigateToProxy();
+        });
+
+        githubUrlInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); // 阻止默认的回车行为 (如果在一个 form 中)
-                navigateToProxy();
+                event.preventDefault();
+                // Simular clic en el botón para el efecto ripple y la navegación
+                accelerateButton.click(); 
             }
         });
+
+        // Función para el efecto Ripple
+        function createRipple(event) {
+            const button = event.currentTarget;
+            
+            // Limpiar ripples anteriores si la animación es rápida
+            const existingRipple = button.querySelector(".ripple");
+            if (existingRipple) {
+                existingRipple.remove();
+            }
+
+            const circle = document.createElement("span");
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            
+            const rect = button.getBoundingClientRect();
+            circle.style.left = `${event.clientX - rect.left - radius}px`;
+            circle.style.top = `${event.clientY - rect.top - radius}px`;
+            
+            circle.classList.add("ripple");
+            button.appendChild(circle);
+
+            // Limpiar el ripple después de la animación
+            circle.addEventListener('animationend', () => {
+                circle.remove();
+            });
+        }
     </script>
 </body>
 </html>
