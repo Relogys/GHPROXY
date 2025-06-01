@@ -15,12 +15,15 @@
 
     <style>
         :root {
-            --bg-color: #0A0A0A; /* Muy oscuro, casi negro */
+            --bg-color: #0A0A0A;
             --text-color: #EAEAEA;
-            --primary-accent: #007AFF; /* Un azul brillante como acento, o puedes elegir otro */
+            --primary-accent: #007AFF; 
+            --primary-accent-rgb: 0, 122, 255; /* RGB 版本的主强调色，用于辉光 */
             --secondary-accent: #333333;
             --line-color: #222222;
             --font-main: 'Inter', 'Noto Sans SC', sans-serif;
+            --modal-bg-color: #181818;
+            --modal-border-color: var(--secondary-accent);
         }
 
         *, *::before, *::after {
@@ -30,7 +33,7 @@
         }
 
         html {
-            font-size: 16px; /* Base para REM */
+            font-size: 16px;
             scroll-behavior: smooth;
         }
 
@@ -42,9 +45,9 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden; /* Para que el preloader cubra todo */
-            opacity: 0; /* Empezar invisible para el preloader */
-            animation: fadeInBody 0.5s 0.5s ease-out forwards; /* Retraso para que el preloader se vea */
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInBody 0.5s 0.5s ease-out forwards;
         }
 
         @keyframes fadeInBody {
@@ -69,25 +72,25 @@
         #preloader.loaded {
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
         }
 
         .preloader-bar {
             width: 0%;
-            height: 2px; /* Sutil, como en el sitio de inspiración */
+            height: 2px;
             background-color: var(--primary-accent);
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation: preloadAnimation 1s ease-out forwards; /* Duración del preloader */
+            animation: preloadAnimation 1s ease-out forwards;
         }
 
         @keyframes preloadAnimation {
             0% { width: 0%; }
-            80% { width: 80%; } /* Simula carga */
+            80% { width: 80%; }
             100% { width: 100%; }
         }
-
 
         /* --- Lines Decorativas --- */
         .decorative-lines {
@@ -96,7 +99,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Para que no interfieran con clics */
+            pointer-events: none;
             z-index: 1;
         }
         .line {
@@ -114,7 +117,6 @@
             to { opacity: 1; transform: scaleX(1) scaleY(1); }
         }
 
-
         /* --- Contenedor Principal --- */
         .accelerator-container {
             padding: 3rem 2rem;
@@ -125,7 +127,7 @@
             z-index: 2;
             opacity: 0;
             transform: translateY(20px);
-            animation: contentFadeInUp 0.8s 1.2s ease-out forwards; /* Retraso mayor para después de líneas */
+            animation: contentFadeInUp 0.8s 1.2s ease-out forwards;
         }
 
         @keyframes contentFadeInUp {
@@ -135,28 +137,71 @@
             }
         }
 
+        /* --- 主标题 H1 --- */
         h1 {
-            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-size: clamp(2rem, 6vw, 3rem); /* 稍微加大标题 */
             font-weight: 700;
-            margin-bottom: 0.5em;
+            margin-bottom: 0.5em; /* 初始间距，会被副标题动画影响 */
             letter-spacing: -0.5px;
-            color: var(--text-color); /* Más brillante que el texto normal */
+            color: var(--text-color);
+            position: relative; /* 为了辉光伪元素定位 */
+            cursor: default; /* 保持默认光标，因为辉光是视觉效果 */
+            display: inline-block; /* 使伪元素基于内容实际宽度 */
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* 平滑推动效果 */
+            /* 初始状态，后续会被JS或父类状态改变 */
+            transform: translateY(0); 
+        }
+        
+        /* 辉光效果伪元素 */
+        h1::before {
+            content: '';
+            position: absolute;
+            left: var(--glow-x, 50%); /* JS会更新这些变量 */
+            top: var(--glow-y, 50%);
+            width: 150px; /* 辉光大小 */
+            height: 150px;
+            background: radial-gradient(circle, 
+                        rgba(var(--primary-accent-rgb), 0.3) 0%, /* 辉光中心颜色和透明度 */
+                        transparent 60% /* 辉光边缘平滑过渡到透明 */
+            );
+            transform: translate(-50%, -50%); /* 确保辉光以鼠标为中心 */
+            opacity: var(--glow-opacity, 0); /* JS控制显隐 */
+            transition: opacity 0.3s ease-out;
+            pointer-events: none; /* 确保伪元素不干扰鼠标事件 */
+            z-index: -1; /* 在文本之后 */
+        }
+        
+        /* 当输入框聚焦时，主标题向上移动 */
+        .input-focused h1 {
+            transform: translateY(-20px); /* 向上推动的距离 */
         }
 
+
+        /* --- 副标题 --- */
         .subtitle {
             font-size: clamp(0.9rem, 2.5vw, 1.1rem);
             font-weight: 300;
             color: var(--text-color);
-            opacity: 0.8;
-            margin-bottom: 2.5em;
+            margin-bottom: 2.5em; /* 最终的间距 */
             line-height: 1.6;
+            opacity: 0; /* 初始隐藏 */
+            transform: translateY(30px); /* 初始位置在下方 */
+            transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transition-delay: 0.1s; /* 在标题移动后稍微延迟出现 */
         }
+
+        /* 当输入框聚焦时，副标题出现 */
+        .input-focused .subtitle {
+            opacity: 0.8; /* 最终透明度 */
+            transform: translateY(0);
+        }
+
 
         #githubUrl {
             width: 100%;
             padding: 1rem 1.25rem;
             margin-bottom: 1.5em;
-            background-color: rgba(255, 255, 255, 0.05); /* Muy sutil */
+            background-color: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--secondary-accent);
             border-radius: 6px;
             font-size: 1rem;
@@ -173,7 +218,7 @@
         #githubUrl:focus {
             outline: none;
             border-color: var(--primary-accent);
-            background-color: rgba(0, 122, 255, 0.08); /* Sutil color de acento en foco */
+            background-color: rgba(var(--primary-accent-rgb), 0.08);
         }
 
         .button-accelerate {
@@ -193,7 +238,7 @@
 
         .button-accelerate:hover {
             background-color: var(--primary-accent);
-            color: var(--bg-color); /* O un blanco muy brillante */
+            color: var(--bg-color);
             transform: translateY(-2px);
         }
         
@@ -201,7 +246,7 @@
             transform: translateY(0px);
         }
 
-        .ripple { /* Efecto de la versión anterior, se ve bien aquí también */
+        .ripple {
             position: absolute;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.3);
@@ -217,30 +262,91 @@
             }
         }
         
-        .footer-info {
+        /* 移除了 footer-info 样式 */
+
+        /* --- 页面内模态框 (Modal) 样式 --- */
+        .modal-overlay {
             position: fixed;
-            bottom: 25px; /* Ajustado para no superponerse con la línea */
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8rem;
-            color: var(--text-color);
-            opacity: 0.4;
-            text-decoration: none;
-            transition: opacity 0.3s ease;
-            z-index: 2;
-            animation: contentFadeInUp 0.8s 1.5s ease-out forwards; /* Mismo retraso + un poco más */
-        }
-        .footer-info:hover {
-            opacity: 0.8;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background-color: var(--modal-bg-color);
+            padding: 2rem 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            border: 1px solid var(--modal-border-color);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.8em;
+        }
+
+        .modal-message {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 1.8em;
+            line-height: 1.6;
+        }
+
+        .modal-button {
+            background-color: var(--primary-accent);
+            color: var(--bg-color);
+            padding: 0.7rem 1.8rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .modal-button:hover {
+            background-color: #005cbf;
+            transform: translateY(-1px);
+        }
 
         /* Adaptabilidad */
         @media (max-width: 768px) {
             .line.top, .line.bottom, .line.left, .line.right {
                 top: 15px; bottom: 15px; left: 15px; right: 15px;
             }
-            .footer-info { bottom: 15px; }
+            /* 移除了 footer-info 的媒体查询 */
+            .modal { padding: 1.5rem 2rem; }
         }
     </style>
 </head>
@@ -256,43 +362,109 @@
         <span class="line bottom"></span>
     </div>
 
-    <main class="accelerator-container">
-        <h1>GitHub 加速</h1>
-        <p class="subtitle">粘贴您的 GitHub 文件链接，体验如丝般顺滑的加速下载。</p>
-        
-        <input type="text" id="githubUrl" placeholder="例如: https://github.com/user/repo/blob/main/file.zip">
-        <button class="button-accelerate" id="accelerateButton">立即加速</button>
-    </main>
+    <!-- 添加了一个外层容器用于状态管理 -->
+    <div class="content-wrapper" id="contentWrapper">
+        <main class="accelerator-container">
+            <h1 id="mainTitle">GitHub 加速</h1>
+            <p class="subtitle" id="mainSubtitle">粘贴您的 GitHub 文件链接，体验如丝般顺滑的加速下载。<br>由 Relogys 精心为您呈现。</p>
+            
+            <input type="text" id="githubUrl" placeholder="例如: https://github.com/user/repo/blob/main/file.zip">
+            <button class="button-accelerate" id="accelerateButton">立即加速</button>
+        </main>
+    </div>
 
-    <a href="mailto:Relogys@outlook.com" class="footer-info">Relogys@outlook.com</a>
+    <!-- 移除了底部的邮箱链接 -->
+
+    <div class="modal-overlay" id="pageModalOverlay"></div>
+    <div class="modal" id="pageModal">
+        <h2 class="modal-title" id="modalTitle">提示</h2>
+        <p class="modal-message" id="modalMessage">请输入有效的 GitHub 文件链接！</p>
+        <button class="modal-button" id="modalCloseButton">确定</button>
+    </div>
+
 
     <script>
         // --- Preloader ---
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
-            // Dar tiempo a la animación de la barra de carga antes de ocultar
             setTimeout(() => {
                 preloader.classList.add('loaded');
-                document.body.style.overflow = 'auto'; // Restaurar scroll si es necesario
-            }, 500); // Debe ser un poco menos que la duración de preloadAnimation para que la barra complete
+                document.body.style.overflow = 'auto';
+            }, 500); 
         });
 
+        // --- 页面内模态框 (Modal) 逻辑 ---
+        const modalOverlay = document.getElementById('pageModalOverlay');
+        const pageModal = document.getElementById('pageModal');
+        const modalTitleElement = document.getElementById('modalTitle');
+        const modalMessageElement = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        function showPageModal(title, message) {
+            modalTitleElement.textContent = title;
+            modalMessageElement.textContent = message;
+            modalOverlay.classList.add('active');
+            pageModal.classList.add('active');
+        }
+
+        function hidePageModal() {
+            modalOverlay.classList.remove('active');
+            pageModal.classList.remove('active');
+        }
+
+        modalCloseButton.addEventListener('click', hidePageModal);
+        modalOverlay.addEventListener('click', hidePageModal);
+
+
+        // --- 标题辉光效果 和 副标题动画 ---
+        const mainTitle = document.getElementById('mainTitle');
+        const githubUrlInput = document.getElementById('githubUrl');
+        const contentWrapper = document.getElementById('contentWrapper'); // 获取新的包装器
+
+        // 标题辉光
+        mainTitle.addEventListener('mousemove', (e) => {
+            const rect = mainTitle.getBoundingClientRect();
+            const x = e.clientX - rect.left; // 鼠标相对于标题的X坐标
+            const y = e.clientY - rect.top;  // 鼠标相对于标题的Y坐标
+            mainTitle.style.setProperty('--glow-x', `${x}px`);
+            mainTitle.style.setProperty('--glow-y', `${y}px`);
+        });
+
+        mainTitle.addEventListener('mouseenter', () => {
+            mainTitle.style.setProperty('--glow-opacity', '1');
+        });
+
+        mainTitle.addEventListener('mouseleave', () => {
+            mainTitle.style.setProperty('--glow-opacity', '0');
+        });
+
+        // 副标题动画触发
+        let inputFocusedOnce = false; //确保动画只触发一次
+        githubUrlInput.addEventListener('focus', () => {
+            if (!inputFocusedOnce) {
+                contentWrapper.classList.add('input-focused'); // 在包装器上添加类
+                // inputFocusedOnce = true; // 如果你希望这个动画只发生一次，取消这行注释
+            }
+        });
+        
+        // 如果你希望失去焦点时恢复，可以添加 blur 事件监听器
+        githubUrlInput.addEventListener('blur', () => {
+            // 如果希望失去焦点时恢复动画，可以在这里移除 'input-focused' 类
+            // contentWrapper.classList.remove('input-focused');
+        });
+
+
         // --- Funcionalidad del Acelerador ---
-        // !!! IMPORTANTE: El PREFIX debe coincidir con tu script de Cloudflare Worker !!!
-        const PREFIX = '/gh/'; // Por ejemplo '/gh/' o '/' (según tu configuración de Worker)
+        const PREFIX = '/gh/'; 
 
         const accelerateButton = document.getElementById('accelerateButton');
-        const githubUrlInput = document.getElementById('githubUrl');
 
         function navigateToProxy() {
             const githubUrl = githubUrlInput.value.trim();
             if (githubUrl) {
-                // Comprobar si la URL ya es una URL de github (raw, blob, etc)
-                // Si no, asumir que es un enlace corto o necesita ser procesado.
-                // Para este ejemplo simple, solo redirigimos.
                 window.location.href = window.location.origin + PREFIX + githubUrl;
             } else {
-                alert('请输入有效的 GitHub 文件链接！');
+                showPageModal("操作提示", "请输入有效的 GitHub 文件链接！"); 
                 githubUrlInput.focus();
             }
         }
@@ -305,32 +477,25 @@
         githubUrlInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                accelerateButton.click(); // Simula el clic para el ripple y la navegación
+                accelerateButton.click();
             }
         });
 
-        // Función para el efecto Ripple (del ejemplo anterior, funciona bien)
         function createRipple(event) {
             const button = event.currentTarget;
-            
             const existingRipple = button.querySelector(".ripple");
             if (existingRipple) {
                 existingRipple.remove();
             }
-
             const circle = document.createElement("span");
             const diameter = Math.max(button.clientWidth, button.clientHeight);
             const radius = diameter / 2;
-
             circle.style.width = circle.style.height = `${diameter}px`;
-            
             const rect = button.getBoundingClientRect();
             circle.style.left = `${event.clientX - rect.left - radius}px`;
             circle.style.top = `${event.clientY - rect.top - radius}px`;
-            
             circle.classList.add("ripple");
             button.appendChild(circle);
-
             circle.addEventListener('animationend', () => {
                 circle.remove();
             });
